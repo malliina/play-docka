@@ -1,0 +1,3 @@
+GET        /                    controllers.Home.index
+GET        /health              controllers.Home.health
+GET        /assets/*file        controllers.Assets.at(path = "/public", file)

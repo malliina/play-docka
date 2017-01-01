@@ -21,7 +21,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockerSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.5",
+    version := "0.0.8",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"
@@ -41,7 +41,6 @@ object PlayBuild {
   // We roll the dockerCommands from scratch because we want to at least make the script executable
   def dockerSettings = Seq(
     dockerBaseDir := (defaultLinuxInstallLocation in Docker).value,
-//    dockerEntryPoint := s"bin/${executableScriptName.value}",
     dockerExecutable := s"${dockerBaseDir.value}/${dockerEntrypoint.value}",
     dockerExposedPorts := Seq(9000),
     dockerCommands := {

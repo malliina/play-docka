@@ -1,0 +1,9 @@
+phases:
+  build:
+    commands:
+      - echo Packaging started on `date` ...
+      - sbt codeBuild
+      - echo Packaging completed on `date`
+artifacts:
+  files:
+    - target\docker\play-docka-codebuild.zip

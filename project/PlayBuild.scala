@@ -1,6 +1,6 @@
-import com.typesafe.sbt.packager.Keys.{dockerCmd, dockerEntrypoint, dockerBaseImage => _, dockerCommands => _, dockerExposedPorts => _, _}
+import com.typesafe.sbt.packager.Keys._
 import com.typesafe.sbt.packager.MappingsHelper
-import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport._
+import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.Docker
 import com.typesafe.sbt.packager.docker.{Cmd, CmdLike, DockerPlugin, ExecCmd}
 import com.typesafe.sbt.packager.universal.Archives
 import org.apache.commons.io.FilenameUtils
@@ -13,7 +13,11 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 object PlayBuild {
   val dockerBaseDir = settingKey[String]("WORKDIR")
   val dockerExecutable = settingKey[String]("Docker executable script")
-  val dockerZip = taskKey[File]("Zip the app")
+  val dockerZip = taskKey[File]("Zips the app")
+  val dockerZipTarget = taskKey[File]("The target zip file")
+  val createBuildSpec = taskKey[File]("Builds and returns the AWS CodeBuild buildspec.yaml file")
+  val codeBuildArtifact = taskKey[File]("Output artifact for CodeBuild")
+  val codeBuild = taskKey[File]("Builds the artifact used in buildspec.yml for AWS CodeBuild")
 
   lazy val p = Project("play-docka", file("."))
     .enablePlugins(BuildInfoPlugin, PlayScala)
@@ -58,15 +62,35 @@ object PlayBuild {
         ExecCmd("CMD", dockerCmd.value: _*)
       )
     },
+    dockerZipTarget := (target in Docker).value / s"${name.value}-${version.value}.zip",
+    codeBuildArtifact := (target in Docker).value / s"${name.value}-codebuild.zip",
     dockerZip := {
       val dest = zipDir(
         (stagingDirectory in Docker).value,
-        (target in Docker).value / s"${name.value}-${version.value}.zip"
+        dockerZipTarget.value
       )
       streams.value.log.info(s"Created $dest")
       dest
     },
-    dockerZip := (dockerZip dependsOn (stage in Docker)).value
+    dockerZip := (dockerZip dependsOn (stage in Docker)).value,
+    codeBuild := {
+      val zip = dockerZip.value
+      val dest = codeBuildArtifact.value
+      val isSuccess = zip.renameTo(dest)
+      if (isSuccess) {
+        streams.value.log.info(s"Moved to $dest")
+        dest
+      } else {
+        sys.error(s"Unable to move $zip file to $dest")
+      }
+    },
+    createBuildSpec := {
+      val artifact = baseDirectory.value.toPath.relativize(codeBuildArtifact.value.toPath)
+      val buildSpecFile = (baseDirectory.value / BuildSpec.FileName).toPath
+      val buildSpecContents = BuildSpec.writeForArtifact(artifact, buildSpecFile)
+      streams.value.log.info(s"$buildSpecContents")
+      buildSpecFile.toFile
+    }
   )
 
   /** Zips `sourceDir`.
@@ -76,6 +100,7 @@ object PlayBuild {
     * @return the zipped file
     */
   def zipDir(sourceDir: File, zipTarget: File): File = {
+    // TODO fix this
     val targetDir = Option(zipTarget.getParentFile) getOrElse new File(".")
     val name = FilenameUtils.getBaseName(zipTarget.getName)
     val mappings = MappingsHelper.contentOf(sourceDir)

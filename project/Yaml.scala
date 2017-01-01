@@ -1,7 +1,3 @@
-package tests
-
-import org.scalatest.FunSuite
-
 import scala.language.implicitConversions
 
 sealed trait YamlDoc extends YamlValue
@@ -76,53 +72,4 @@ trait Yaml {
   def value(s: String) = Entry(s)
 
   def row = EmptyRow
-}
-
-class YamlTests extends FunSuite {
-
-  import Yaml._
-
-  test("can write yaml") {
-    val yaml = doc(
-      single("version", "0.1"),
-      row,
-      section("environment_variables")(
-        section("plaintext")(
-          single("JAVA_HOME", "/usr/lib/jvm/java-8-openjdk-amd64")
-        )
-      ),
-      row,
-      section("phases")(
-        section("install")(
-          arr("commands")(
-            "apt-get update -y",
-            "apt-get install -y maven"
-          )
-        ),
-        section("pre_build")(
-          arr("commands")(
-            "echo Nothing to do in the pre_build phase..."
-          )
-        ),
-        section("build")(
-          arr("commands")(
-            "echo Build started on `date`",
-            "mvn install"
-          )
-        ),
-        section("post_build")(
-          arr("commands")(
-            "echo Build completed on `date`"
-          )
-        )
-      ),
-      section("artifacts")(
-        arr("files")(
-          "target/messageUtil-1.0.jar"
-        ),
-        single("discard-paths", "yes")
-      )
-    )
-    println(stringifyDoc(yaml))
-  }
 }

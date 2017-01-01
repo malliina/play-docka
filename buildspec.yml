@@ -8,4 +8,4 @@ phases:
       - echo Packaging completed on `date`
 artifacts:
   files:
-    - target\docker\play-docka-codebuild.zip
+    - target/docker/play-docka-codebuild.zip

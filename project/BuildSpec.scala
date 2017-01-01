@@ -35,7 +35,7 @@ object BuildSpec {
     ),
     section("artifacts")(
       arr("files")(
-        artifact.toString
+        artifact.toString.replace('\\', '/')
       )
     )
   )

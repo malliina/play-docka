@@ -22,6 +22,8 @@ object BuildSpec {
   }
 
   def forArtifact(artifact: Path): YamlContainer = doc(
+    single("version", "0.1"),
+    row,
     section("phases")(
       section("build")(
         arr("commands")(

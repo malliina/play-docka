@@ -9,4 +9,8 @@ target/
 *.pem
 credentials.txt
 logs
-dist
+dist
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

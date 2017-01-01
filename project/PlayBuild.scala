@@ -13,7 +13,6 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 object PlayBuild {
   val dockerBaseDir = settingKey[String]("WORKDIR")
   val dockerExecutable = settingKey[String]("Docker executable script")
-//  val dockerEntryPoint = settingKey[String]("ENTRYPOINT")
   val dockerZip = taskKey[File]("Zip the app")
 
   lazy val p = Project("play-docka", file("."))
@@ -22,7 +21,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockerSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.4",
+    version := "0.0.5",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"

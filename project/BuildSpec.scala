@@ -1,5 +1,4 @@
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
 
 import Yaml._
 import sbt.{File, IO}
@@ -9,7 +8,7 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object BuildSpec {
   val FileName = "buildspec.yml"
 
-  def writeForArtifact(artifact: File, dest: Path) =
+  def writeForArtifact(artifact: File, dest: File) =
     writeYaml(forArtifact(artifact), dest)
 
   /**
@@ -17,9 +16,9 @@ object BuildSpec {
     * @param yaml contents to write
     * @return the written contents
     */
-  def writeYaml(yaml: YamlContainer, dest: Path): String = {
+  def writeYaml(yaml: YamlContainer, dest: File): String = {
     val asString = stringifyDoc(yaml)
-    IO.write(dest.toFile, asString, StandardCharsets.UTF_8)
+    IO.write(dest, asString, StandardCharsets.UTF_8)
     asString
   }
 
@@ -30,7 +29,7 @@ object BuildSpec {
       section("build")(
         arr("commands")(
           "echo Packaging started on `date` ...",
-          "sbt docker:stage",
+          "sbt codeBuild",
           "echo Packaging completed on `date`"
         )
       )
@@ -40,7 +39,8 @@ object BuildSpec {
         artifact.toString.replace('\\', '/')
       ),
       single("discard-paths", "yes")
-    )
+    ),
+    beanstalkExtension()
   )
 
   def beanstalkExtension(role: String = "codebuild-docka-build-service-role",

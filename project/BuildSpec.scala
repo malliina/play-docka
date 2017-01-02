@@ -4,6 +4,8 @@ import java.nio.file.Path
 import Yaml._
 import sbt.IO
 
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
+
 object BuildSpec {
   val FileName = "buildspec.yml"
 
@@ -37,6 +39,18 @@ object BuildSpec {
       arr("files")(
         artifact.toString.replace('\\', '/')
       )
-    )
+    ),
+    beanstalkExtension()
   )
+
+  def beanstalkExtension(role: String = "codebuild-docka-build-service-role",
+                         computeType: String = "BUILD_GENERAL1_SMALL",
+                         image: String = "hseeberger/scala-sbt",
+                         timeout: FiniteDuration = 60.minutes) =
+    section("eb_codebuild_settings")(
+      single("CodeBuildServiceRole", role),
+      single("ComputeType", computeType),
+      single("Image", image),
+      single("Timeout", timeout.toMinutes.toString)
+    )
 }

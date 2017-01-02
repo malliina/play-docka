@@ -18,6 +18,7 @@ object PlayBuild {
   val createBuildSpec = taskKey[File]("Builds and returns the AWS CodeBuild buildspec.yaml file")
   val codeBuildArtifact = taskKey[File]("Output artifact for CodeBuild")
   val codeBuild = taskKey[File]("Builds the artifact used in buildspec.yml for AWS CodeBuild")
+  val codePipeline = taskKey[Unit]("Prepare for CodePipeline deployment")
 
   lazy val p = Project("play-docka", file("."))
     .enablePlugins(BuildInfoPlugin, PlayScala)
@@ -91,7 +92,11 @@ object PlayBuild {
       val buildSpecContents = BuildSpec.writeForArtifact(artifact, buildSpecFile)
       streams.value.log.info(s"$buildSpecContents")
       buildSpecFile
-    }
+    },
+    codePipeline := {
+      IO.copyDirectory((stagingDirectory in Docker).value, baseDirectory.value)
+    },
+    codePipeline := (codePipeline dependsOn (stage in Docker)).value
   )
 
   /** Zips `sourceDir`.

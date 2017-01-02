@@ -29,18 +29,17 @@ object BuildSpec {
       section("build")(
         arr("commands")(
           "echo Packaging started on `date` ...",
-          "sbt codeBuild",
+          "sbt codePipeline",
           "echo Packaging completed on `date`"
         )
       )
     ),
     section("artifacts")(
       arr("files")(
-        artifact.toString.replace('\\', '/')
-      ),
-      single("discard-paths", "yes")
-    ),
-    beanstalkExtension()
+        "Dockerfile",
+        "opt/**/*"
+      )
+    )
   )
 
   def beanstalkExtension(role: String = "codebuild-docka-build-service-role",

@@ -85,7 +85,8 @@ object PlayBuild {
       }
     },
     createBuildSpec := {
-      val artifact = baseDirectory.value.toPath.relativize(codeBuildArtifact.value.toPath)
+//      val artifact = baseDirectory.value.toPath.relativize(codeBuildArtifact.value.toPath)
+      val artifact = baseDirectory.value.relativize((stagingDirectory in Docker).value).get / "**" / "*"
       val buildSpecFile = (baseDirectory.value / BuildSpec.FileName).toPath
       val buildSpecContents = BuildSpec.writeForArtifact(artifact, buildSpecFile)
       streams.value.log.info(s"$buildSpecContents")

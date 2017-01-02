@@ -2,14 +2,14 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 
 import Yaml._
-import sbt.IO
+import sbt.{File, IO}
 
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 object BuildSpec {
   val FileName = "buildspec.yml"
 
-  def writeForArtifact(artifact: Path, dest: Path) =
+  def writeForArtifact(artifact: File, dest: Path) =
     writeYaml(forArtifact(artifact), dest)
 
   /**
@@ -23,14 +23,14 @@ object BuildSpec {
     asString
   }
 
-  def forArtifact(artifact: Path): YamlContainer = doc(
+  def forArtifact(artifact: File): YamlContainer = doc(
     single("version", "0.1"),
     row,
     section("phases")(
       section("build")(
         arr("commands")(
           "echo Packaging started on `date` ...",
-          "sbt codeBuild",
+          "sbt docker:stage",
           "echo Packaging completed on `date`"
         )
       )

@@ -10,3 +10,8 @@ artifacts:
   files:
     - Dockerfile
     - opt/**/*
+eb_codebuild_settings:
+  CodeBuildServiceRole: codebuild-docka-build-service-role
+  ComputeType: BUILD_GENERAL1_SMALL
+  Image: hseeberger/scala-sbt
+  Timeout: 60

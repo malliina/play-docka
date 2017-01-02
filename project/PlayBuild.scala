@@ -87,17 +87,25 @@ object PlayBuild {
     },
     createBuildSpec := {
       val artifact = baseDirectory.value.relativize(codeBuildArtifact.value).get
-//      val artifact = baseDirectory.value.relativize((stagingDirectory in Docker).value).get / "**" / "*"
       val buildSpecFile = baseDirectory.value / BuildSpec.FileName
       val buildSpecContents = BuildSpec.writeForArtifact(artifact, buildSpecFile)
       streams.value.log.info(s"$buildSpecContents")
       buildSpecFile
     },
     codePipeline := {
+      val baseDir = baseDirectory.value
+      failIfExists(baseDir / "Dockerfile", baseDir / "opt")
       IO.copyDirectory((stagingDirectory in Docker).value, baseDirectory.value)
     },
     codePipeline := (codePipeline dependsOn (stage in Docker)).value
   )
+
+  def failIfExists(files: File*) = files foreach { file =>
+    if (file.exists()) {
+      val desc = if (file.isDirectory) "Directory" else "File"
+      sys.error(s"$desc must not exist: $file")
+    }
+  }
 
   /** Zips `sourceDir`.
     *

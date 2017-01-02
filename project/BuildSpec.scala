@@ -38,9 +38,9 @@ object BuildSpec {
     section("artifacts")(
       arr("files")(
         artifact.toString.replace('\\', '/')
-      )
-    ),
-    beanstalkExtension()
+      ),
+      single("discard-paths", "yes")
+    )
   )
 
   def beanstalkExtension(role: String = "codebuild-docka-build-service-role",

@@ -9,8 +9,4 @@ phases:
 artifacts:
   files:
     - target/docker/play-docka-codebuild.zip
-eb_codebuild_settings:
-  CodeBuildServiceRole: codebuild-docka-build-service-role
-  ComputeType: BUILD_GENERAL1_SMALL
-  Image: hseeberger/scala-sbt
-  Timeout: 60
+  discard-paths: yes

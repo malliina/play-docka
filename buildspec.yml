@@ -8,5 +8,4 @@ phases:
       - echo Packaging completed on `date`
 artifacts:
   files:
-    - target/docker/stage/*
-  discard-paths: yes
+    - target/docker/stage/**/*

@@ -39,7 +39,8 @@ object BuildSpec {
         "Dockerfile",
         "opt/**/*"
       )
-    )
+    ),
+    beanstalkExtension()
   )
 
   def beanstalkExtension(role: String = "codebuild-docka-build-service-role",

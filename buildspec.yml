@@ -8,7 +8,7 @@ phases:
       - echo Packaging completed on `date`
 artifacts:
   files:
-    - target/docker/stage/play-docka-codebuild.zip
+    - target/docker/play-docka-codebuild.zip
   discard-paths: yes
 eb_codebuild_settings:
   CodeBuildServiceRole: codebuild-docka-build-service-role

@@ -27,7 +27,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockerSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.13",
+    version := "0.0.14",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"
@@ -103,8 +103,11 @@ object PlayBuild {
       }
     },
     ebDeploy := {
+      val log = streams.value.log
       val appLabel = s"${name.value}-${version.value.replace('.', '-')}"
-      val exitValue = Process(Seq("eb", "deploy", "-l", appLabel)).run(streams.value.log).exitValue()
+      val cmd = Seq("eb", "deploy", "-l", appLabel)
+      log info s"Running '${cmd mkString " "}'... this make take a few minutes..."
+      val exitValue = Process(cmd).run(log).exitValue()
       if (exitValue != 0) {
         sys.error(s"Unexpected exit value: $exitValue")
       }

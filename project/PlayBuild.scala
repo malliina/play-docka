@@ -16,9 +16,9 @@ object PlayBuild {
   val dockerZip = taskKey[File]("Zips the app")
   val dockerZipTarget = taskKey[File]("The target zip file")
   val createBuildSpec = taskKey[File]("Builds and returns the AWS CodeBuild buildspec.yaml file")
-  val codeBuildArtifact = taskKey[File]("Output artifact for CodeBuild")
-  val codeBuild = taskKey[File]("Builds the artifact used in buildspec.yml for AWS CodeBuild")
   val codePipeline = taskKey[Unit]("Prepare for CodePipeline deployment")
+  val codeBuildArtifacts = taskKey[Seq[File]]("Build output artifacts for buildspec.yml")
+  val codeBuildFiles = taskKey[Seq[String]]("buildspec.yml entries under array files")
 
   lazy val p = Project("play-docka", file("."))
     .enablePlugins(BuildInfoPlugin, PlayScala)
@@ -64,7 +64,6 @@ object PlayBuild {
       )
     },
     dockerZipTarget := (target in Docker).value / s"${name.value}-${version.value}.zip",
-    codeBuildArtifact := (target in Docker).value / s"${name.value}-codebuild.zip",
     dockerZip := {
       val dest = zipDir(
         (stagingDirectory in Docker).value,
@@ -74,33 +73,37 @@ object PlayBuild {
       dest
     },
     dockerZip := (dockerZip dependsOn (stage in Docker)).value,
-    codeBuild := {
-      val zip = dockerZip.value
-      val dest = codeBuildArtifact.value
-      val isSuccess = zip.renameTo(dest)
-      if (isSuccess) {
-        streams.value.log.info(s"Moved to $dest")
-        dest
-      } else {
-        sys.error(s"Unable to move $zip file to $dest")
-      }
-    },
     createBuildSpec := {
-      val artifact = baseDirectory.value.relativize(codeBuildArtifact.value).get
       val buildSpecFile = baseDirectory.value / BuildSpec.FileName
-      val buildSpecContents = BuildSpec.writeForArtifact(artifact, buildSpecFile)
+      val artifacts = codeBuildFiles.value
+      val buildSpecContents = BuildSpec.writeForArtifact("codePipeline", artifacts, buildSpecFile)
       streams.value.log.info(s"$buildSpecContents")
       buildSpecFile
     },
     codePipeline := {
-      val baseDir = baseDirectory.value
-      failIfExists(baseDir / "Dockerfile", baseDir / "opt")
+      failIfExists(codeBuildArtifacts.value)
       IO.copyDirectory((stagingDirectory in Docker).value, baseDirectory.value)
     },
-    codePipeline := (codePipeline dependsOn (stage in Docker)).value
+    codePipeline := (codePipeline dependsOn (stage in Docker)).value,
+    codeBuildArtifacts := {
+      val baseDir = baseDirectory.value
+      val stagingDir = (stagingDirectory in Docker).value
+      val artifactFiles = stagingDir.listFiles().map(_.relativeTo(stagingDir).get)
+      artifactFiles.map(file => baseDir / file.toString)
+    },
+    codeBuildArtifacts := (codeBuildArtifacts dependsOn (stage in Docker)).value,
+    codeBuildFiles := {
+      val files = codeBuildArtifacts.value
+      // Prefers failure over flatMap
+      files.map(_.relativeTo(baseDirectory.value).get) map { p =>
+        val asString = p.toString.replace('\\', '/')
+        if(p.isDirectory) s"$asString/**/*"
+        else asString
+      }
+    }
   )
 
-  def failIfExists(files: File*) = files foreach { file =>
+  def failIfExists(files: Seq[File]) = files foreach { file =>
     if (file.exists()) {
       val desc = if (file.isDirectory) "Directory" else "File"
       sys.error(s"$desc must not exist: $file")
@@ -114,8 +117,8 @@ object PlayBuild {
     * @return the zipped file
     */
   def zipDir(sourceDir: File, zipTarget: File): File = {
-    // TODO fix this
-    val targetDir = Option(zipTarget.getParentFile) getOrElse new File(".")
+    val targetDir = Option(zipTarget.getParentFile)
+      .getOrElse(sys.error(s"Target must have a parent: $zipTarget"))
     val name = FilenameUtils.getBaseName(zipTarget.getName)
     val mappings = MappingsHelper.contentOf(sourceDir)
     Archives.makeZip(targetDir, name, mappings, None)

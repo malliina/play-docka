@@ -8,8 +8,8 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object BuildSpec {
   val FileName = "buildspec.yml"
 
-  def writeForArtifact(artifact: File, dest: File) =
-    writeYaml(forArtifact(artifact), dest)
+  def writeForArtifact(sbtCommand: String, artifacts: Seq[String], dest: File) =
+    writeYaml(forArtifacts(sbtCommand, artifacts), dest)
 
   /**
     * @param dest destination file
@@ -22,23 +22,20 @@ object BuildSpec {
     asString
   }
 
-  def forArtifact(artifact: File): YamlContainer = doc(
+  def forArtifacts(sbtCommand: String, artifacts: Seq[String]): YamlContainer = doc(
     single("version", "0.1"),
     row,
     section("phases")(
       section("build")(
         arr("commands")(
           "echo Packaging started on `date` ...",
-          "sbt codePipeline",
+          s"sbt $sbtCommand",
           "echo Packaging completed on `date`"
         )
       )
     ),
     section("artifacts")(
-      arr("files")(
-        "Dockerfile",
-        "opt/**/*"
-      )
+      arr("files")(artifacts.map(ArrEntry.apply): _*)
     ),
     beanstalkExtension()
   )

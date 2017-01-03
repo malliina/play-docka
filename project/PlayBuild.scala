@@ -19,7 +19,7 @@ object PlayBuild {
   val codePipeline = taskKey[Unit]("Prepare for CodePipeline deployment")
   val codeBuildArtifacts = taskKey[Seq[File]]("Build output artifacts for buildspec.yml")
   val codeBuildFiles = taskKey[Seq[String]]("buildspec.yml entries under array files")
-  val ebDeploy = taskKey[Unit]("Deploys the app to Elastic Beanstalk using")
+  val ebDeploy = taskKey[Unit]("Deploys the app to Elastic Beanstalk")
 
   lazy val p = Project("play-docka", file("."))
     .enablePlugins(BuildInfoPlugin, PlayScala)

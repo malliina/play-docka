@@ -19,6 +19,7 @@ object PlayBuild {
   val codePipeline = taskKey[Unit]("Prepare for CodePipeline deployment")
   val codeBuildArtifacts = taskKey[Seq[File]]("Build output artifacts for buildspec.yml")
   val codeBuildFiles = taskKey[Seq[String]]("buildspec.yml entries under array files")
+  val ebDeploy = taskKey[Unit]("Deploys the app to Elastic Beanstalk using")
 
   lazy val p = Project("play-docka", file("."))
     .enablePlugins(BuildInfoPlugin, PlayScala)
@@ -26,7 +27,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockerSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.12",
+    version := "0.0.13",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"
@@ -97,8 +98,15 @@ object PlayBuild {
       // Prefers failure over flatMap
       files.map(_.relativeTo(baseDirectory.value).get) map { p =>
         val asString = p.toString.replace('\\', '/')
-        if(p.isDirectory) s"$asString/**/*"
+        if (p.isDirectory) s"$asString/**/*"
         else asString
+      }
+    },
+    ebDeploy := {
+      val appLabel = s"${name.value}-${version.value.replace('.', '-')}"
+      val exitValue = Process(Seq("eb", "deploy", "-l", appLabel)).run(streams.value.log).exitValue()
+      if (exitValue != 0) {
+        sys.error(s"Unexpected exit value: $exitValue")
       }
     }
   )

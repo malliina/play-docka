@@ -4,12 +4,12 @@ phases:
   build:
     commands:
       - echo Packaging started on `date` ...
-      - sbt codeBuild
+      - sbt codePipeline
       - echo Packaging completed on `date`
 artifacts:
   files:
-    - target/docker/play-docka-codebuild.zip
-  discard-paths: yes
+    - Dockerfile
+    - opt/**/*
 eb_codebuild_settings:
   CodeBuildServiceRole: codebuild-docka-build-service-role
   ComputeType: BUILD_GENERAL1_SMALL

@@ -26,7 +26,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockerSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.11",
+    version := "0.0.12",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"
@@ -56,7 +56,7 @@ object PlayBuild {
         Cmd("WORKDIR", dockerBaseDir.value),
         makeAdd(dockerBaseDir.value),
         makeChown(user, group, Seq(".")),
-        ExecCmd("RUN", ("chmod" :: "u+x" :: dockerEntrypoint.value.toList): _*),
+        ExecCmd("RUN", "chmod" :: "u+x" :: dockerEntrypoint.value.toList: _*),
         Cmd("EXPOSE", dockerExposedPorts.value.mkString(" ")),
         Cmd("USER", user),
         ExecCmd("ENTRYPOINT", dockerEntrypoint.value: _*),

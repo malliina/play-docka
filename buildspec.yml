@@ -4,12 +4,11 @@ phases:
   build:
     commands:
       - echo Packaging started on `date` ...
-      - sbt codePipeline
+      - sbt docker:stage
       - echo Packaging completed on `date`
 artifacts:
   files:
-    - Dockerfile
-    - opt/**/*
+    - target/docker/stage/**/*
 eb_codebuild_settings:
   CodeBuildServiceRole: codebuild-docka-build-service-role
   ComputeType: BUILD_GENERAL1_SMALL

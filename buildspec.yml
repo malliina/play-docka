@@ -4,7 +4,7 @@ phases:
   build:
     commands:
       - echo Packaging started on `date` ...
-      - sbt codePipeline
+      - sbt codeBuild
       - echo Packaging completed on `date`
 artifacts:
   files:

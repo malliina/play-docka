@@ -8,8 +8,8 @@ import scala.concurrent.duration.{DurationInt, FiniteDuration}
 object BuildSpec {
   val FileName = "buildspec.yml"
 
-  def writeForArtifact(sbtCommand: String, artifacts: Seq[String], dest: File) =
-    writeYaml(forArtifacts(sbtCommand, artifacts), dest)
+  def writeForArtifact(sbtCommand: String, serviceRole: String, artifacts: Seq[String], dest: File) =
+    writeYaml(forArtifacts(sbtCommand, serviceRole, artifacts), dest)
 
   /**
     * @param dest destination file
@@ -22,7 +22,7 @@ object BuildSpec {
     asString
   }
 
-  def forArtifacts(sbtCommand: String, artifacts: Seq[String]): YamlContainer = doc(
+  def forArtifacts(sbtCommand: String, serviceRole: String, artifacts: Seq[String]): YamlContainer = doc(
     single("version", "0.1"),
     row,
     section("phases")(
@@ -37,15 +37,15 @@ object BuildSpec {
     section("artifacts")(
       arr("files")(artifacts.map(ArrEntry.apply): _*)
     ),
-    beanstalkExtension()
+    beanstalkExtension(serviceRole)
   )
 
-  def beanstalkExtension(role: String = "codebuild-docka-build-service-role",
+  def beanstalkExtension(serviceRole: String,
                          computeType: String = "BUILD_GENERAL1_SMALL",
                          image: String = "hseeberger/scala-sbt",
                          timeout: FiniteDuration = 60.minutes) =
     section("eb_codebuild_settings")(
-      single("CodeBuildServiceRole", role),
+      single("CodeBuildServiceRole", serviceRole),
       single("ComputeType", computeType),
       single("Image", image),
       single("Timeout", timeout.toMinutes.toString)

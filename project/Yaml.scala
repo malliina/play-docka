@@ -1,8 +1,12 @@
+import sbt.File
+
 import scala.language.implicitConversions
 
 sealed trait YamlDoc extends YamlValue
 
-sealed trait YamlValue
+sealed trait YamlValue {
+  override def toString = Yaml.stringify(this)
+}
 
 case class YamlContainer(children: Seq[YamlDoc])
 
@@ -24,6 +28,8 @@ case class Entry(value: String)
 
 object Entry {
   implicit def fromString(s: String): Entry = Entry(s)
+
+  implicit def fromFile(f: File): Entry = f.toString
 }
 
 object Yaml extends Yaml {

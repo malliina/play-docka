@@ -1,3 +1,5 @@
+import java.nio.charset.StandardCharsets
+
 import com.typesafe.sbt.packager.Keys._
 import com.typesafe.sbt.packager.MappingsHelper
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.Docker
@@ -15,11 +17,17 @@ object PlayBuild {
   val dockerExecutable = settingKey[String]("Docker executable script")
   val dockerZip = taskKey[File]("Zips the app")
   val dockerZipTarget = taskKey[File]("The target zip file")
+  val buildSpecFile = taskKey[File]("The buildspec.yml file for AWS CodeBuild")
+  val tempSpecFile = settingKey[File]("Temporary buildspec-temp.yml")
   val createBuildSpec = taskKey[File]("Builds and returns the AWS CodeBuild buildspec.yaml file")
   val codePipeline = taskKey[Unit]("Prepare for CodePipeline deployment")
   val codeBuildArtifacts = taskKey[Seq[File]]("Build output artifacts for buildspec.yml")
   val codeBuildFiles = taskKey[Seq[String]]("buildspec.yml entries under array files")
+  val ebConfigFile = taskKey[File]("Beanstalk config file")
+  val tempEbConfigFile = taskKey[File]("Temporary beanstalk config file")
+  val ebLabel = taskKey[String]("Beanstalk app version")
   val ebDeploy = taskKey[Unit]("Deploys the app to Elastic Beanstalk")
+  val localEbDeploy = taskKey[Unit]("Deploys a locally packaged .zip to Beanstalk")
 
   lazy val p = Project("play-docka", file("."))
     .enablePlugins(BuildInfoPlugin, PlayScala)
@@ -27,7 +35,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockerSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.15",
+    version := "0.0.21",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"
@@ -37,11 +45,6 @@ object PlayBuild {
       PlayImport.specs2 % Test,
       "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
     )
-  )
-
-  def buildInfoSettings = Seq(
-    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
-    buildInfoPackage := "com.malliina.app.build"
   )
 
   // We roll the dockerCommands from scratch because we want to at least make the script executable
@@ -64,7 +67,7 @@ object PlayBuild {
         ExecCmd("CMD", dockerCmd.value: _*)
       )
     },
-    dockerZipTarget := (target in Docker).value / s"${name.value}-${version.value}.zip",
+    dockerZipTarget := (target in Docker).value / s"${ebLabel.value}.zip",
     dockerZip := {
       val dest = zipDir(
         (stagingDirectory in Docker).value,
@@ -74,12 +77,14 @@ object PlayBuild {
       dest
     },
     dockerZip := (dockerZip dependsOn (stage in Docker)).value,
+    buildSpecFile := baseDirectory.value / BuildSpec.FileName,
+    tempSpecFile := baseDirectory.value / "buildspec-temp.yml",
     createBuildSpec := {
-      val buildSpecFile = baseDirectory.value / BuildSpec.FileName
+      val dest = buildSpecFile.value
       val artifacts = codeBuildFiles.value
-      val buildSpecContents = BuildSpec.writeForArtifact("codePipeline", artifacts, buildSpecFile)
+      val buildSpecContents = BuildSpec.writeForArtifact("codePipeline", artifacts, dest)
       streams.value.log.info(s"$buildSpecContents")
-      buildSpecFile
+      dest
     },
     codePipeline := {
       failIfExists(codeBuildArtifacts.value)
@@ -102,17 +107,70 @@ object PlayBuild {
         else asString
       }
     },
+    ebConfigFile := baseDirectory.value / ".elasticbeanstalk" / "config.yml",
+    tempEbConfigFile := baseDirectory.value / ".elasticbeanstalk" / "config-temp.yml",
+    ebLabel := s"${name.value}-${version.value.replace('.', '-')}",
     ebDeploy := {
       val log = streams.value.log
-      val appLabel = s"${name.value}-${version.value.replace('.', '-')}"
-      val cmd = Seq("eb", "deploy", "-l", appLabel)
+      val cmd = Seq("eb", "deploy", "-l", ebLabel.value)
       log info s"Running '${cmd mkString " "}'... this make take a few minutes..."
       val exitValue = Process(cmd).run(log).exitValue()
       if (exitValue != 0) {
         sys.error(s"Unexpected exit value: $exitValue")
       }
-    }
+    },
+    localEbDeploy := deployLocalZip.value
   )
+
+  def deployLocalZip = Def.taskDyn {
+    deployLocally.dependsOn(renameSpecFile).doFinally(renameSpecFileBack.taskValue)
+  }
+
+  def buildInfoSettings = Seq(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
+    buildInfoPackage := "com.malliina.app.build"
+  )
+
+  def renameSpecFile = Def.task {
+    maybeRename(buildSpecFile.value, tempSpecFile.value)
+  }
+
+  def renameSpecFileBack = Def.task {
+    maybeRename(tempSpecFile.value, buildSpecFile.value)
+    ()
+  }
+
+  def maybeRename(file: File, dest: File) =
+    if (file.exists()) file renameTo dest
+    else false
+
+  def deployLocally = Def.taskDyn {
+    ebDeploy.dependsOn(changeEbConf).doFinally(changeEbConfBack.taskValue)
+  }
+
+  def changeEbConf = Def.task {
+    val zip = dockerZip.value
+    val ebConfig = ebConfigFile.value
+    if (!ebConfig.exists()) sys.error(s"$ebConfig does not exist")
+    val oldConfig = IO.read(ebConfig, StandardCharsets.UTF_8)
+    val tempConf = tempEbConfigFile.value
+    val renameSuccess = maybeRename(ebConfig, tempConf)
+    if (!renameSuccess) sys.error(s"Unable to rename $ebConfig to $tempConf")
+    val deploySection = Yaml.section("deploy")(
+      Yaml.single("artifact", (zip relativeTo baseDirectory.value).get)
+    )
+    val newConfig = s"$oldConfig\n${Yaml.stringify(deploySection)}"
+    streams.value.log.info(s"Writing $ebConfig")
+    IO.write(ebConfig, newConfig, StandardCharsets.UTF_8, append = false)
+  }
+
+  def changeEbConfBack = Def.task {
+    val tempConf = tempEbConfigFile.value
+    val ebConf = ebConfigFile.value
+    if(tempConf.exists() && ebConf.exists()) ebConf.delete()
+    maybeRename(tempConf, ebConf)
+    ()
+  }
 
   def failIfExists(files: Seq[File]) = files foreach { file =>
     if (file.exists()) {

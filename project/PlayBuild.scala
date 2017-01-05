@@ -18,6 +18,7 @@ object PlayBuild {
       "-encoding", "UTF-8"
     ),
     libraryDependencies ++= Seq(
+      "com.amazonaws" % "aws-java-sdk" % "1.11.75",
       "com.lihaoyi" %% "scalatags" % "0.6.2",
       PlayImport.specs2 % Test,
       "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test

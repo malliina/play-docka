@@ -12,7 +12,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockaSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.22",
+    version := "0.0.23",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"

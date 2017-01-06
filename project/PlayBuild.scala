@@ -1,4 +1,4 @@
-import BeanstalkPlugin._
+import com.malliina.sbt.aws.AwsDockerKeys.codeBuildServiceRole
 import play.sbt.{PlayImport, PlayScala}
 import sbt.Keys._
 import sbt._
@@ -12,7 +12,7 @@ object PlayBuild {
 
   lazy val commonSettings = buildInfoSettings ++ dockaSettings ++ Seq(
     organization := "com.malliina",
-    version := "0.0.23",
+    version := "0.0.25",
     scalaVersion := "2.11.8",
     scalacOptions ++= Seq(
       "-encoding", "UTF-8"
@@ -25,8 +25,8 @@ object PlayBuild {
     )
   )
 
-  def dockaSettings = dockerSettings ++ Seq(
-    codeBuildServiceRole := "codebuild-docka-build-service-role"
+  def dockaSettings = Seq(
+    codeBuildServiceRole := Option("codebuild-docka-build-service-role")
   )
 
   def buildInfoSettings = Seq(

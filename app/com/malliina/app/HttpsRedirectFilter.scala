@@ -1,19 +1,11 @@
 package com.malliina.app
 
-import com.malliina.app.HttpsRedirectFilter._
 import play.api.http.HeaderNames
 import play.api.libs.json.Json
 import play.api.libs.streams.Accumulator
-import play.api.mvc.{EssentialAction, EssentialFilter, RequestHeader, Results}
+import play.api.mvc._
 
 import scala.util.Try
-
-object HttpsRedirectFilter {
-  val CFVisitor = "CF-Visitor"
-  val Http = "http"
-  val Https = "https"
-  val Scheme = "scheme"
-}
 
 /**
   * @see https://aws.amazon.com/premiumsupport/knowledge-center/redirect-http-https-elb/
@@ -33,26 +25,57 @@ class HttpsRedirectFilter extends EssentialFilter {
     * @return a possible redirection
     */
   override def apply(next: EssentialAction): EssentialAction = EssentialAction { rh =>
-    val proto = cloudFlareProto(rh) orElse xForwardedProto(rh)
-    val shouldRedirect = proto contains Http
+    val shouldRedirect = Proxies.hasPlainHeaders(rh.headers)
     if (shouldRedirect)
-      Accumulator.done(Results.MovedPermanently(s"$Https://${rh.host}${rh.uri}"))
+      Accumulator.done(Results.MovedPermanently(s"${Proxies.Https}://${rh.host}${rh.uri}"))
     else
       next(rh)
   }
+}
+
+/** I was unsuccessful in getting `request.secure` to work in Play,
+  * so I rolled my own.
+  */
+object Proxies {
+  val Http = "http"
+  val Https = "https"
+
+  val CFVisitor = "CF-Visitor"
+  val Scheme = "scheme"
+
+  /** Call me instead of `request.secure`.
+    *
+    * @param rh request
+    * @return true if the requests seems to use SSL, false otherwise
+    */
+  def isSecure(rh: RequestHeader): Boolean =
+    rh.secure || hasSecureHeaders(rh.headers)
+
+  def hasPlainHeaders(headers: Headers): Boolean =
+    proto(headers) contains Http
+
+  def hasSecureHeaders(headers: Headers): Boolean =
+    proto(headers) contains Https
+
+  /**
+    * @param headers request headers
+    * @return the raw protocol value, based on `headers` alone
+    */
+  def proto(headers: Headers): Option[String] =
+    cloudFlareProto(headers) orElse xForwardedProto(headers)
 
   /** Example CF-Visitor value: {"scheme":"https"} or {"scheme":"http"}.
     *
-    * @param rh request header
+    * @param headers request headers
     * @return the scheme, if any
     */
-  def cloudFlareProto(rh: RequestHeader): Option[String] =
+  def cloudFlareProto(headers: Headers): Option[String] =
     for {
-      visitor <- rh.headers.get(CFVisitor)
+      visitor <- headers.get(CFVisitor)
       json <- Try(Json.parse(visitor)).toOption
       proto <- (json \ Scheme).validate[String].asOpt
     } yield proto
 
-  def xForwardedProto(rh: RequestHeader): Option[String] =
-    rh.headers.get(HeaderNames.X_FORWARDED_PROTO)
+  def xForwardedProto(headers: Headers): Option[String] =
+    headers.get(HeaderNames.X_FORWARDED_PROTO)
 }

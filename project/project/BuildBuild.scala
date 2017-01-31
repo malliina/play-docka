@@ -11,8 +11,9 @@ object BuildBuild {
   )
 
   def sbtPlugins = Seq(
+    "com.malliina" % "sbt-aws-docker" % "0.0.1",
     "com.typesafe.play" % "sbt-plugin" % "2.5.10",
-    "se.marcuslonnberg" % "sbt-docker" % "1.4.0",
+//    "se.marcuslonnberg" % "sbt-docker" % "1.4.0",
     "com.eed3si9n" % "sbt-buildinfo" % "0.6.1"
   ) map addSbtPlugin
 }

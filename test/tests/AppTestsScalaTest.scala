@@ -1,12 +1,12 @@
 package tests
 
-import com.malliina.app.HttpsRedirectFilter.{CFVisitor, Http, Https, Scheme}
 import com.malliina.app.{AppComponents, WithAppComponents}
 import org.scalatest.FunSuite
 import play.api.http.HeaderNames.X_FORWARDED_PROTO
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import com.malliina.app.Proxies._
 
 class AppTestsScalaTest extends FunSuite with OneAppPerSuite2[AppComponents] with WithAppComponents {
 

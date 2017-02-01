@@ -1,4 +1,6 @@
 import com.malliina.sbt.aws.AwsDockerKeys.codeBuildServiceRole
+import com.typesafe.sbt.packager.Keys.scriptClasspath
+import play.sbt.PlayImport.PlayKeys.externalizeResources
 import play.sbt.{PlayImport, PlayScala}
 import sbt.Keys._
 import sbt._
@@ -22,7 +24,9 @@ object PlayBuild {
       "com.lihaoyi" %% "scalatags" % "0.6.2",
       PlayImport.specs2 % Test,
       "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
-    )
+    ),
+    externalizeResources := false,
+    scriptClasspath := Seq("*")
   )
 
   def dockaSettings = Seq(

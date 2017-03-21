@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 import scala.collection.JavaConversions._
 
 class BeanstalkSDK extends FunSuite {
-  test("run sdk") {
+  ignore("run sdk") {
     val client: AWSElasticBeanstalk = AWSElasticBeanstalkClientBuilder.standard()
       .withRegion(Regions.EU_WEST_1)
       .build()

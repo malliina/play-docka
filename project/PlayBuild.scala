@@ -1,4 +1,3 @@
-import com.malliina.sbt.aws.AwsDockerKeys.codeBuildServiceRole
 import com.malliina.sbtplay.PlayProject
 import com.typesafe.sbt.packager.docker.DockerPlugin
 import com.typesafe.sbt.packager.docker.DockerPlugin.autoImport.dockerRepository
@@ -22,7 +21,6 @@ object PlayBuild {
     libraryDependencies ++= Seq(
       "com.amazonaws" % "aws-java-sdk" % "1.11.75"
     ),
-    codeBuildServiceRole := Option("codebuild-docka-build-service-role"),
     dockerRepository := Option("malliina")
   )
 

@@ -3,15 +3,9 @@ version: 0.1
 phases:
   build:
     commands:
-      - echo Packaging started on `date` ...
-      - sbt codeBuild
-      - echo Packaging completed on `date`
+      - sbt docker:stage
 artifacts:
   files:
     - Dockerfile
     - opt/**/*
-eb_codebuild_settings:
-  CodeBuildServiceRole: codebuild-docka-build-service-role
-  ComputeType: BUILD_GENERAL1_SMALL
-  Image: hseeberger/scala-sbt
-  Timeout: 60
+  base-directory: target/docker/stage

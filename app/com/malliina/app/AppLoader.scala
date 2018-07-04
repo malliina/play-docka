@@ -1,6 +1,6 @@
 package com.malliina.app
 
-import controllers.{Assets, Home}
+import controllers.{AssetsComponents, Home}
 import play.api.ApplicationLoader.Context
 import play.api.BuiltInComponentsFromContext
 import play.api.mvc.EssentialFilter
@@ -9,11 +9,10 @@ import router.Routes
 
 class AppLoader extends LoggingAppLoader[AppComponents] with WithAppComponents
 
-class AppComponents(context: Context) extends BuiltInComponentsFromContext(context) {
+class AppComponents(context: Context) extends BuiltInComponentsFromContext(context) with AssetsComponents {
   override lazy val httpFilters: Seq[EssentialFilter] = Seq(new HttpsRedirectFilter)
-  lazy val assets = new Assets(httpErrorHandler)
   val secretService = SecretService
-  val home = new Home
+  val home = new Home(controllerComponents)
 
   override val router: Router = new Routes(httpErrorHandler, home, assets)
 }

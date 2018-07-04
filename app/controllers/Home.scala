@@ -4,7 +4,7 @@ import com.malliina.app.build.BuildInfo
 import play.api.libs.json.Json
 import play.api.mvc._
 
-class Home extends Controller {
+class Home(comps: ControllerComponents) extends AbstractController(comps) {
   val Welcome = "Welcome"
   val App = "app"
   val Version = "version"

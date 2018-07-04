@@ -1,36 +1,30 @@
 package tests
 
 import com.malliina.app.WithComponents
-import org.scalatest.{Suite, TestData}
-import org.scalatestplus.play.{OneAppPerSuite, OneAppPerTest, OneServerPerSuite, OneServerPerTest}
-import play.api.{Application, BuiltInComponents}
+import org.scalatest.TestSuite
+import org.scalatestplus.play._
+import play.api.BuiltInComponents
 
 // Similar to https://github.com/gmethvin/play-2.5.x-scala-compile-di-with-tests/blob/master/test/ScalaTestWithComponents.scala
 
-trait WithTestComponents[T <: BuiltInComponents] extends WithComponents[T] {
+trait WithTestComponents[T <: BuiltInComponents] extends WithComponents[T] with FakeApplicationFactory {
   lazy val components: T = createComponents(TestAppLoader.createTestAppContext)
+
+  override def fakeApplication() = components.application
 }
 
-trait OneAppPerSuite2[T <: BuiltInComponents] extends OneAppPerSuite with WithTestComponents[T] {
-  self: Suite =>
-
-  override implicit lazy val app: Application = components.application
+trait OneAppPerSuite2[T <: BuiltInComponents] extends BaseOneAppPerSuite with WithTestComponents[T] {
+  self: TestSuite =>
 }
 
-trait OneAppPerTest2[T <: BuiltInComponents] extends OneAppPerTest with WithTestComponents[T] {
-  self: Suite =>
-
-  override def newAppForTest(testData: TestData): Application = components.application
+trait OneAppPerTest2[T <: BuiltInComponents] extends BaseOneAppPerTest with WithTestComponents[T] {
+  self: TestSuite =>
 }
 
-trait OneServerPerSuite2[T <: BuiltInComponents] extends OneServerPerSuite with WithTestComponents[T] {
-  self: Suite =>
-
-  override implicit lazy val app: Application = components.application
+trait OneServerPerSuite2[T <: BuiltInComponents] extends BaseOneServerPerSuite with WithTestComponents[T] {
+  self: TestSuite =>
 }
 
-trait OneServerPerTest2[T <: BuiltInComponents] extends OneServerPerTest with WithTestComponents[T] {
-  self: Suite =>
-
-  override def newAppForTest(testData: TestData): Application = components.application
+trait OneServerPerTest2[T <: BuiltInComponents] extends BaseOneServerPerTest with WithTestComponents[T] {
+  self: TestSuite =>
 }

@@ -10,7 +10,7 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-java-sdk" % "1.11.360"
+  "com.amazonaws" % "aws-java-sdk-elasticbeanstalk" % "1.11.360" % Test
 )
 dockerRepository := Option("malliina")
 

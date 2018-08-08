@@ -9,8 +9,11 @@ import router.Routes
 
 class AppLoader extends LoggingAppLoader[AppComponents] with WithAppComponents
 
-class AppComponents(context: Context) extends BuiltInComponentsFromContext(context) with AssetsComponents {
-  override lazy val httpFilters: Seq[EssentialFilter] = Seq(new HttpsRedirectFilter)
+class AppComponents(context: Context)
+  extends BuiltInComponentsFromContext(context)
+    with AssetsComponents {
+//  override lazy val httpFilters: Seq[EssentialFilter] = Seq(new HttpsRedirectFilter)
+  override lazy val httpFilters: Seq[EssentialFilter] = Nil
   val secretService = SecretService
   val as = new AssetsBuilder(httpErrorHandler, assetsMetadata)
   val home = new Home(as, controllerComponents)

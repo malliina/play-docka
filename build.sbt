@@ -4,7 +4,7 @@ lazy val p = PlayProject.default("play-docka")
   .enablePlugins(BuildInfoPlugin, DockerPlugin)
 
 organization := "com.malliina"
-version := "0.2.0"
+version := "0.3.0"
 scalaVersion := "2.12.6"
 scalacOptions ++= Seq(
   "-encoding", "UTF-8"

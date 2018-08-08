@@ -1,7 +1,12 @@
 import com.malliina.sbtplay.PlayProject
 
+import scala.sys.process.Process
+import scala.util.Try
+
 lazy val p = PlayProject.default("play-docka")
   .enablePlugins(BuildInfoPlugin, DockerPlugin)
+
+val gitHash = settingKey[String]("Git hash")
 
 organization := "com.malliina"
 version := "0.3.0"
@@ -14,7 +19,12 @@ libraryDependencies ++= Seq(
 )
 dockerRepository := Option("malliina")
 
-buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
+gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption
+  .orElse(sys.env.get("CODEBUILD_RESOLVED_SOURCE_VERSION").map(_.take(7)))
+  .orElse(sys.env.get("CODEBUILD_SOURCE_VERSION").map(_.take(7)))
+  .getOrElse("latest")
+
+buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, "gitHash" -> gitHash.value)
 buildInfoPackage := "com.malliina.app.build"
 
 dependencyOverrides ++= Seq(

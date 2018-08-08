@@ -18,7 +18,7 @@ class AppTestsScalaTest extends FunSuite with OneAppPerSuite2[AppComponents] wit
     assert(withHeaders() === 200)
   }
 
-  test("X-Forwarded-Proto 1") {
+  ignore("X-Forwarded-Proto 1") {
     assert(withHeaders(X_FORWARDED_PROTO -> Http) === MOVED_PERMANENTLY)
   }
 
@@ -26,7 +26,7 @@ class AppTestsScalaTest extends FunSuite with OneAppPerSuite2[AppComponents] wit
     assert(withHeaders(X_FORWARDED_PROTO -> Https) !== MOVED_PERMANENTLY)
   }
 
-  test("CF-Visitor 1") {
+  ignore("CF-Visitor 1") {
     val responseStatus = withHeaders(
       CFVisitor -> Json.stringify(Json.obj(Scheme -> Http)),
       X_FORWARDED_PROTO -> Https)

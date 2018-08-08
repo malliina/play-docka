@@ -9,6 +9,7 @@ class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractC
   val Welcome = "Welcome"
   val App = "app"
   val Version = "version"
+  val GitHash = "gitHash"
   val NoCache = "no-cache"
 
   def index = Action {
@@ -16,7 +17,7 @@ class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractC
   }
 
   def health = Action {
-    Ok(Json.obj(App -> BuildInfo.name, Version -> BuildInfo.version))
+    Ok(Json.obj(App -> BuildInfo.name, Version -> BuildInfo.version, GitHash -> BuildInfo.gitHash))
       .withHeaders(CACHE_CONTROL -> NoCache)
   }
 

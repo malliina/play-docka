@@ -12,7 +12,7 @@ object AppTags {
     html(
       body(
         h2(msg),
-        p(s"$appName $appVersion")
+        p(s"$appName $appVersion ${BuildInfo.gitHash}")
       )
     )
   )

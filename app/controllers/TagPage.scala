@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets
 
 import akka.util.ByteString
 import play.api.http.{MimeTypes, Writeable}
-
 import scalatags.Text
 
 /** Helper that enables imports-free usage in Play's `Action`s such as: `Action(Ok(myTags))`.

@@ -1,7 +1,6 @@
 package controllers
 
 import com.malliina.app.build.BuildInfo
-
 import scalatags.Text.all._
 
 object AppTags {

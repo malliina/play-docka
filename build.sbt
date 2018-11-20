@@ -9,14 +9,14 @@ lazy val p = PlayProject.default("play-docka")
 val gitHash = settingKey[String]("Git hash")
 
 organization := "com.malliina"
-version := "0.3.0"
-scalaVersion := "2.12.6"
+version := "0.4.0"
+scalaVersion := "2.12.7"
 scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
-libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-java-sdk-elasticbeanstalk" % "1.11.360" % Test
-)
+//libraryDependencies ++= Seq(
+//  "com.amazonaws" % "aws-java-sdk-elasticbeanstalk" % "1.11.360" % Test
+//)
 dockerRepository := Option("malliina")
 
 gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption
@@ -26,8 +26,3 @@ gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption
 
 buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, "gitHash" -> gitHash.value)
 buildInfoPackage := "com.malliina.app.build"
-
-dependencyOverrides ++= Seq(
-  "com.typesafe.akka" %% "akka-stream" % "2.5.11",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.11"
-)

@@ -2,16 +2,19 @@ package controllers
 
 import com.malliina.app.build.BuildInfo
 import controllers.Assets.Asset
+import controllers.Home._
 import play.api.libs.json.Json
 import play.api.mvc._
 
-class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractController(comps) {
+object Home {
   val Welcome = "Welcome"
   val App = "app"
   val Version = "version"
   val GitHash = "gitHash"
   val NoCache = "no-cache"
+}
 
+class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractController(comps) {
   def index = Action {
     Ok(AppTags.index(Welcome))
   }

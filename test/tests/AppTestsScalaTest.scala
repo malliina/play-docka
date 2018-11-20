@@ -9,11 +9,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
 class AppTestsScalaTest extends FunSuite with OneAppPerSuite2[AppComponents] with WithAppComponents {
-
-  test("can access a component of the running test app") {
-    assert(components.secretService.secret === 42)
-  }
-
   test("can make request") {
     assert(withHeaders() === 200)
   }

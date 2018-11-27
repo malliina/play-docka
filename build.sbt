@@ -14,9 +14,6 @@ scalaVersion := "2.12.7"
 scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
-//libraryDependencies ++= Seq(
-//  "com.amazonaws" % "aws-java-sdk-elasticbeanstalk" % "1.11.360" % Test
-//)
 dockerRepository := Option("malliina")
 
 gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption

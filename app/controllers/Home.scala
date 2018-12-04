@@ -17,6 +17,7 @@ object Home {
 class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractController(comps) {
   def index = Action {
     Ok(AppTags.index(Welcome))
+      .withHeaders(CACHE_CONTROL -> s"max-age=10")
   }
 
   def health = Action {

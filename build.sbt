@@ -23,3 +23,6 @@ gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption
 
 buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, "gitHash" -> gitHash.value)
 buildInfoPackage := "com.malliina.app.build"
+
+pipelineStages := Seq(digest, gzip)
+pipelineStages in Assets := Seq(digest, gzip)

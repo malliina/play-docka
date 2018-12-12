@@ -1,6 +1,7 @@
 package controllers
 
 import com.malliina.app.build.BuildInfo
+import com.malliina.app.db.{DatabaseConf, HikariConnection}
 import controllers.Assets.Asset
 import controllers.Home._
 import play.api.libs.json.Json
@@ -15,8 +16,11 @@ object Home {
 }
 
 class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractController(comps) {
+  val db = DatabaseConf().map { conf => HikariConnection(conf) }
+
   def index = Action {
-    Ok(AppTags.index(Welcome))
+    val msg = db.map(data => s"Connected to ${data.getJdbcUrl}.").toOption
+    Ok(AppTags.index(msg))
       .withHeaders(CACHE_CONTROL -> s"max-age=10")
   }
 

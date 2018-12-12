@@ -8,16 +8,18 @@ import scalatags.Text.all._
 object AppTags {
   implicit val callAttr = new GenericAttr[Call]
   val reverse = routes.Home
+  val empty = modifier()
 
-  def index(msg: String) = TagPage(
+  def index(msg: Option[String]) = TagPage(
     html(
       head(
         link(rel := "stylesheet", href := reverse.versioned("css/main.css")),
         link(rel := "shortcut icon", href := reverse.versioned("img/favicon-256.png"))
       ),
       body(
-        h2(msg),
-        p(s"$name $version $gitHash")
+        h2("Welcome"),
+        p(s"$name $version $gitHash"),
+        msg.fold(empty)(m => p(m))
       )
     )
   )

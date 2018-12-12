@@ -10,7 +10,7 @@ val gitHash = settingKey[String]("Git hash")
 
 organization := "com.malliina"
 version := "0.4.0"
-scalaVersion := "2.12.7"
+scalaVersion := "2.12.8"
 scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
@@ -26,3 +26,8 @@ buildInfoPackage := "com.malliina.app.build"
 
 pipelineStages := Seq(digest, gzip)
 pipelineStages in Assets := Seq(digest, gzip)
+
+libraryDependencies ++= Seq(
+  "com.zaxxer" % "HikariCP" % "3.2.0",
+  "mysql" % "mysql-connector-java" % "5.1.47"
+)

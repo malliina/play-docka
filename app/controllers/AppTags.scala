@@ -10,7 +10,7 @@ object AppTags {
   val reverse = routes.Home
   val empty = modifier()
 
-  def index(msg: Option[String]) = TagPage(
+  def index(msgs: Seq[String]) = TagPage(
     html(
       head(
         link(rel := "stylesheet", href := reverse.versioned("css/main.css")),
@@ -19,7 +19,7 @@ object AppTags {
       body(
         h2("Welcome"),
         p(s"$name $version $gitHash"),
-        msg.fold(empty)(m => p(m))
+        msgs.map { msg => p(msg) }
       )
     )
   )

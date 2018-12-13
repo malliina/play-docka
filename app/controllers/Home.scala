@@ -2,6 +2,7 @@ package controllers
 
 import com.malliina.app.build.BuildInfo
 import com.malliina.app.db.{DatabaseConf, HikariConnection}
+import com.malliina.app.redis.JedisRedis
 import controllers.Assets.Asset
 import controllers.Home._
 import play.api.libs.json.Json
@@ -17,10 +18,14 @@ object Home {
 
 class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractController(comps) {
   val db = DatabaseConf().map { conf => HikariConnection(conf) }
+  val redis = JedisRedis().toOption
 
   def index = Action {
-    val msg = db.map(data => s"Connected to ${data.getJdbcUrl}.").toOption
-    Ok(AppTags.index(msg))
+    val dbMessage = db.map(data => s"Connected to ${data.getJdbcUrl}.").toOption
+    val redisMessage = redis.flatMap { c =>
+      c.get("test").map(_ => s"Connected to Redis at '${c.host}'.").toOption
+    }
+    Ok(AppTags.index(dbMessage.toSeq ++ redisMessage.toSeq))
       .withHeaders(CACHE_CONTROL -> s"max-age=10")
   }
 

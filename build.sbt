@@ -29,5 +29,6 @@ pipelineStages in Assets := Seq(digest, gzip)
 
 libraryDependencies ++= Seq(
   "com.zaxxer" % "HikariCP" % "3.2.0",
-  "mysql" % "mysql-connector-java" % "5.1.47"
+  "mysql" % "mysql-connector-java" % "5.1.47",
+  "redis.clients" % "jedis" % "3.0.0"
 )

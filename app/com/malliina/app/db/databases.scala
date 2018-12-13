@@ -14,7 +14,7 @@ object DatabaseConf {
     url <- read("DB_URL")
   } yield DatabaseConf(user, pass, url)
 
-  def read(key: String) = sys.env.get(key).toRight(s"Key not found: '$key'.")
+  def read(key: String) = sys.env.get(key).filter(_.nonEmpty).toRight(s"Key not found: '$key'.")
 }
 
 object HikariConnection {

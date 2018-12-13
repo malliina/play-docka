@@ -15,7 +15,7 @@ object JedisRedis {
   def apply(host: String, port: Int = DefaultPort): JedisRedis = new JedisRedis(host, port)
 
   def apply(): Either[String, JedisRedis] = {
-    sys.env.get(HostKey).toRight(s"Key not found: '$HostKey'.").map { host =>
+    sys.env.get(HostKey).filter(_.nonEmpty).toRight(s"Key not found: '$HostKey'.").map { host =>
       val idx = host.lastIndexOf(":")
       val port = sys.env.get(PortKey).map(_.toInt).getOrElse(DefaultPort)
       if (idx == -1) {

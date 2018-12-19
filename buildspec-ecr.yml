@@ -1,4 +1,6 @@
-# Assumes build environment aws/codebuild/java:openjdk-8 which includes JDK, Docker and awscli
+# Assumes build environment aws/codebuild/java:openjdk-8 which includes JDK, Docker and awscli.
+# Assumes an ECR repo in environment variable REPOSITORY_URI.
+# Can be used with a multi-container Docker Beanstalk platform as a Deploy target in AWS CodePipeline.
 version: 0.2
 env:
   variables:
@@ -26,7 +28,7 @@ phases:
       - docker build -t $REPOSITORY_URI:latest target/docker/stage
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
-    # at-character in sed is used as the delimiter
+    # at-character is used as the delimiter
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...

@@ -26,13 +26,14 @@ phases:
       - docker build -t $REPOSITORY_URI:latest target/docker/stage
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
+    # at-character in sed is used as the delimiter
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - sed -i='' "s/<REPOSITORY_URI>/$REPOSITORY_URI/g" Dockerrun.aws.json
-      - sed -i='' "s/<IMAGE_TAG>/$IMAGE_TAG/g" Dockerrun.aws.json
+      - sed -i='' "s@<REPOSITORY_URI>@$REPOSITORY_URI@" Dockerrun.aws.json
+      - sed -i='' "s@<IMAGE_TAG>@$IMAGE_TAG@" Dockerrun.aws.json
 artifacts:
   files:
     - Dockerrun.aws.json

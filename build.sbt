@@ -15,6 +15,11 @@ scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
 dockerRepository := Option("malliina")
+dockerExposedPorts := Seq(9001)
+javaOptions in Universal ++= Seq(
+  "-J-Xmx256m",
+  "-Dhttp.port=9001"
+)
 
 gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption
   .orElse(sys.env.get("CODEBUILD_RESOLVED_SOURCE_VERSION").map(_.take(7)))

@@ -10,6 +10,10 @@ import router.Routes
 
 class AppLoader extends LoggingAppLoader[AppComponents] with WithAppComponents
 
+object AppComponents {
+  def urlPrefix = "/two"
+}
+
 class AppComponents(context: Context)
   extends BuiltInComponentsFromContext(context)
     with HttpFiltersComponents
@@ -18,5 +22,5 @@ class AppComponents(context: Context)
   override val httpFilters = Seq(new GzipFilter(), csrfFilter, securityHeadersFilter)
   val as = new AssetsBuilder(httpErrorHandler, assetsMetadata)
   val home = new Home(as, controllerComponents)
-  override val router: Router = new Routes(httpErrorHandler, home)
+  override val router: Router = new Routes(httpErrorHandler, home, AppComponents.urlPrefix)
 }

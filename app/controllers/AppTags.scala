@@ -1,5 +1,6 @@
 package controllers
 
+import com.malliina.app.AppComponents
 import com.malliina.app.build.BuildInfo.{gitHash, name, version}
 import play.api.mvc.Call
 import scalatags.Text.GenericAttr
@@ -7,7 +8,8 @@ import scalatags.Text.all._
 
 object AppTags {
   implicit val callAttr = new GenericAttr[Call]
-  val reverse = routes.Home
+
+  val reverse = new ReverseHome(AppComponents.urlPrefix)
   val empty = modifier()
 
   def index(msgs: Seq[String]) = TagPage(
@@ -17,7 +19,7 @@ object AppTags {
         link(rel := "shortcut icon", href := reverse.versioned("img/favicon-256.png"))
       ),
       body(
-        h2("Welcome"),
+        h2("Welcome 2"),
         p(s"$name $version $gitHash"),
         msgs.map { msg => p(msg) }
       )

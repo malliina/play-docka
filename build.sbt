@@ -10,7 +10,7 @@ val gitHash = settingKey[String]("Git hash")
 val dockerHttpPort = settingKey[Int]("HTTP listen port")
 
 organization := "com.malliina"
-version := "0.4.0"
+version := "0.5.0"
 scalaVersion := "2.12.8"
 scalacOptions ++= Seq(
   "-encoding", "UTF-8"
@@ -27,7 +27,7 @@ gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption
   .orElse(sys.env.get("CODEBUILD_SOURCE_VERSION").map(_.take(7)))
   .getOrElse("latest")
 
-dockerHttpPort := sys.env.get("HTTP_PORT").map(_.toInt).getOrElse(9000)
+dockerHttpPort := sys.env.get("HTTP_PORT").map(_.toInt).getOrElse(9001)
 
 buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion, "gitHash" -> gitHash.value)
 buildInfoPackage := "com.malliina.app.build"

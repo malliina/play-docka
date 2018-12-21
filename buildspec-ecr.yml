@@ -8,7 +8,7 @@ env:
 phases:
   install:
     commands:
-      - echo Installing SBT...
+      - echo Installing SBT $SBT_VERSION...
       - apt-get update -y
       - curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
       - dpkg -i sbt-$SBT_VERSION.deb
@@ -23,7 +23,7 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - echo Building the Docker image...
+      - echo Building Docker image from commit hash $COMMIT_HASH...
       - sbt docker:stage
       - docker build -t $REPOSITORY_URI:latest target/docker/stage
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
@@ -31,11 +31,12 @@ phases:
     # at-character is used as the delimiter
     commands:
       - echo Build completed on `date`
-      - echo Pushing the Docker images...
+      - echo Pushing Docker image to $REPOSITORY_URI:$IMAGE_TAG...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - sed -i='' "s@<REPOSITORY_URI>@$REPOSITORY_URI@" Dockerrun.aws.json
       - sed -i='' "s@<IMAGE_TAG>@$IMAGE_TAG@" Dockerrun.aws.json
+      - echo Build complete
 artifacts:
   files:
     - Dockerrun.aws.json

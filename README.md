@@ -10,4 +10,4 @@ The buildspec files in the root of the repo can be used with AWS CodeBuild and C
 |----------------|------------------
 | [buildspec.yml](buildspec.yml) | Single-container Elastic Beanstalk
 | [buildspec-ecr.yml](buildspec-ecr.yml) | Multi-container Elastic Beanstalk
-| [buildspec-ecs.yml](buildspec-ecs.yml) | ECS
+| [buildspec-ecs.yml](buildspec-ecs.yml) | ECS with Fargate

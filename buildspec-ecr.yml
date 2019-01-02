@@ -1,6 +1,7 @@
 # Assumes build environment aws/codebuild/java:openjdk-8 which includes JDK, Docker and awscli.
 # Assumes an ECR repo in environment variable REPOSITORY_URI.
-# Can be used with a multi-container Docker Beanstalk platform as a Deploy target in AWS CodePipeline.
+# Can be used with a AWS Elastic Beanstalk platform as a Deploy target in AWS CodePipeline.
+# Set environment variable STYLE to single or multi for single- or multi-container Docker environments respectively.
 version: 0.2
 env:
   variables:
@@ -34,6 +35,7 @@ phases:
       - echo Pushing Docker image to $REPOSITORY_URI:$IMAGE_TAG...
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - cp Dockerrun-$STYLE.aws.json Dockerrun.aws.json
       - sed -i='' "s@<REPOSITORY_URI>@$REPOSITORY_URI@" Dockerrun.aws.json
       - sed -i='' "s@<IMAGE_TAG>@$IMAGE_TAG@" Dockerrun.aws.json
       - echo Build complete

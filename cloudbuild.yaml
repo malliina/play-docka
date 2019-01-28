@@ -3,3 +3,4 @@ steps:
     args: [ 'sbt', 'docker:stage' ]
   - name: 'gcr.io/cloud-builders/gcloud'
     args: [ 'app', 'deploy', 'target/docker/stage/app.yaml' ]
+timeout: "1800s"

@@ -8,8 +8,9 @@ lazy val p = PlayProject.default("play-docka")
 
 val gitHash = settingKey[String]("Git hash")
 val dockerHttpPort = settingKey[Int]("HTTP listen port")
+val appYamlPath = settingKey[File]("Path to target app.yaml")
 val Gcp = config("gcp")
-val defaultPort = 9000
+val defaultPort = 8080
 val gcpAppEngineHttpPort = 8080
 
 organization := "com.malliina"
@@ -25,20 +26,23 @@ javaOptions in Universal ++= Seq(
   s"-Dhttp.port=${dockerHttpPort.value}"
 )
 
-stage in Gcp := {
-  val gcpYaml = "app.yaml"
-  IO.copyFile(baseDirectory.value / gcpYaml, (stagingDirectory in Docker).value / gcpYaml)
-  stage.in(Docker).value
-}
-stage in Gcp := (stage in Gcp).dependsOn(stage in Docker).value
+mappings in Docker += baseDirectory.value / "app.yaml" -> "app.yaml"
+
+//stage in Gcp := {
+//  IO.copyFile(baseDirectory.value / "app.yaml", appYamlPath.value)
+//  stage.in(Docker).value
+//}
+//stage in Gcp := (stage in Gcp).dependsOn(stage in Docker).value
+//
+//appYamlPath := (stagingDirectory in Docker).value / "app.yaml"
 
 // https://stackoverflow.com/questions/14262798/how-to-change-setting-inside-sbt-command
-commands += Command.command("deployGcp") { state =>
-  val extracted = Project.extract(state)
-  val newState = extracted.appendWithSession(Seq(dockerHttpPort := gcpAppEngineHttpPort), state)
-  val (s, _) = Project.extract(newState).runTask(publish in Gcp, newState)
-  s
-}
+//commands += Command.command("deployGcp") { state =>
+//  val extracted = Project.extract(state)
+//  val newState = extracted.appendWithSession(Seq(dockerHttpPort := gcpAppEngineHttpPort), state)
+//  val (s, _) = Project.extract(newState).runTask(publish in Gcp, newState)
+//  s
+//}
 
 publish in Gcp := {
   val exitValue = Process(s"gcloud app deploy", (stagingDirectory in Docker).value)
@@ -46,7 +50,7 @@ publish in Gcp := {
     .exitValue()
   if (exitValue != 0) sys.error(s"Non-zero exit code: $exitValue.")
 }
-publish in Gcp := (publish in Gcp).dependsOn(stage in Gcp).value
+publish in Gcp := (publish in Gcp).dependsOn(stage in Docker).value
 
 gitHash := Try(Process("git rev-parse --short HEAD").lineStream.head).toOption
   .orElse(sys.env.get("CODEBUILD_RESOLVED_SOURCE_VERSION").map(_.take(7)))

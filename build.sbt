@@ -28,22 +28,6 @@ javaOptions in Universal ++= Seq(
 
 mappings in Docker += baseDirectory.value / "app.yaml" -> "app.yaml"
 
-//stage in Gcp := {
-//  IO.copyFile(baseDirectory.value / "app.yaml", appYamlPath.value)
-//  stage.in(Docker).value
-//}
-//stage in Gcp := (stage in Gcp).dependsOn(stage in Docker).value
-//
-//appYamlPath := (stagingDirectory in Docker).value / "app.yaml"
-
-// https://stackoverflow.com/questions/14262798/how-to-change-setting-inside-sbt-command
-//commands += Command.command("deployGcp") { state =>
-//  val extracted = Project.extract(state)
-//  val newState = extracted.appendWithSession(Seq(dockerHttpPort := gcpAppEngineHttpPort), state)
-//  val (s, _) = Project.extract(newState).runTask(publish in Gcp, newState)
-//  s
-//}
-
 publish in Gcp := {
   val exitValue = Process(s"gcloud app deploy", (stagingDirectory in Docker).value)
     .run(streams.value.log)

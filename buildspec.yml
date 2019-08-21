@@ -1,6 +1,16 @@
-version: 0.1
-
+version: 0.2
+env:
+  variables:
+    SBT_VERSION: "1.2.8"
 phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+    commands:
+      - echo `pwd`
+      - curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb
+      - dpkg -i sbt-$SBT_VERSION.deb
+      - sbt sbtVersion
   build:
     commands:
       - sbt docker:stage

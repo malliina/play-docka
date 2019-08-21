@@ -17,7 +17,9 @@ object Home {
 }
 
 class Home(assets: AssetsBuilder, comps: ControllerComponents) extends AbstractController(comps) {
-  val db = DatabaseConf().map { conf => HikariConnection(conf) }
+  val db = DatabaseConf().map { conf =>
+    HikariConnection(conf)
+  }
   val redis = JedisRedis().toOption
 
   def index = Action {

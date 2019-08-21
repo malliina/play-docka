@@ -84,7 +84,7 @@ class YamlTests extends FunSuite {
 
   test("can write yaml") {
     val yaml = doc(
-      single("version", "0.1"),
+      single("version", "0.2"),
       row,
       section("environment_variables")(
         section("plaintext")(

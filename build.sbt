@@ -1,10 +1,8 @@
-import com.malliina.sbtplay.PlayProject
-
 import scala.sys.process.Process
 import scala.util.Try
 
-lazy val p = PlayProject.default("play-docka")
-  .enablePlugins(BuildInfoPlugin, DockerPlugin)
+lazy val p = Project("play-docka", file("."))
+  .enablePlugins(PlayScala, BuildInfoPlugin, DockerPlugin)
 
 val gitHash = settingKey[String]("Git hash")
 val dockerHttpPort = settingKey[Int]("HTTP listen port")
@@ -13,8 +11,8 @@ val defaultPort = 9000
 val gcpAppEngineHttpPort = 8080
 
 organization := "com.malliina"
-version := "0.4.0"
-scalaVersion := "2.12.8"
+version := "0.5.0"
+scalaVersion := "2.13.0"
 scalacOptions ++= Seq(
   "-encoding", "UTF-8"
 )
@@ -62,7 +60,10 @@ pipelineStages := Seq(digest, gzip)
 pipelineStages in Assets := Seq(digest, gzip)
 
 libraryDependencies ++= Seq(
-  "com.zaxxer" % "HikariCP" % "3.2.0",
+  "com.zaxxer" % "HikariCP" % "3.3.1",
   "mysql" % "mysql-connector-java" % "5.1.47",
-  "redis.clients" % "jedis" % "3.0.0"
+  "redis.clients" % "jedis" % "3.1.0",
+  "com.lihaoyi" %% "scalatags" % "0.7.0",
+  specs2 % Test,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test
 )

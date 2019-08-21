@@ -19,7 +19,9 @@ object AppTags {
       body(
         h2("Welcome"),
         p(s"$name $version $gitHash"),
-        msgs.map { msg => p(msg) }
+        msgs.map { msg =>
+          p(msg)
+        }
       )
     )
   )

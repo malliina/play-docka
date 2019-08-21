@@ -1,7 +1,7 @@
 # play-docka
 
-This is a demo web app for AWS. Check [cfn](https://github.com/malliina/cfn) for AWS CloudFormation templates that use
-this app.
+This is a demo web app for AWS. Check [cfn](https://github.com/malliina/cfn) for AWS CloudFormation 
+templates that use this app.
 
 ## Deployments
 

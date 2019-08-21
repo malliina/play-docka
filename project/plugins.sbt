@@ -8,9 +8,9 @@ classpathTypes += "maven-plugin"
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 Seq(
-  "com.malliina" %% "sbt-play" % "1.4.1",
-//  "com.malliina" % "sbt-aws-docker" % "0.2.2",
+  "com.typesafe.play" % "sbt-plugin" % "2.7.3",
   "com.typesafe.sbt" % "sbt-gzip" % "1.0.2",
   "com.typesafe.sbt" % "sbt-digest" % "1.1.4",
-  "com.typesafe.sbt" % "sbt-less" % "1.1.2"
+  "com.typesafe.sbt" % "sbt-less" % "1.1.2",
+  "com.eed3si9n" % "sbt-buildinfo" % "0.9.0"
 ) map addSbtPlugin

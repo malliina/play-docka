@@ -13,7 +13,7 @@ phases:
       - sbt sbtVersion
   build:
     commands:
-      - sbt docker:stage
+      - sbt clean docker:stage
 artifacts:
   files:
     - Dockerfile

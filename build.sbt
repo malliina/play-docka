@@ -11,7 +11,7 @@ val defaultPort = 9000
 val gcpAppEngineHttpPort = 8080
 
 organization := "com.malliina"
-version := "0.5.0"
+version := "1.0.0"
 scalaVersion := "2.13.0"
 scalacOptions ++= Seq(
   "-encoding", "UTF-8"

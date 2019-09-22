@@ -1,10 +1,5 @@
-scalaVersion := "2.12.8"
+scalaVersion := "2.12.10"
 
-resolvers ++= Seq(
-  Resolver.bintrayRepo("malliina", "maven"),
-  Resolver.url("malliina bintray sbt", url("https://dl.bintray.com/malliina/sbt-plugins/"))(Resolver.ivyStylePatterns)
-)
-classpathTypes += "maven-plugin"
 scalacOptions ++= Seq("-unchecked", "-deprecation")
 
 Seq(
